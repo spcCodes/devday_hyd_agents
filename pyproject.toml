@@ -1,0 +1,21 @@
+[project]
+name = "devday-hyd-agents"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ipython>=9.4.0",
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.27",
+    "langchain-mcp-adapters>=0.1.9",
+    "langchain-openai>=0.3.28",
+    "langchain-perplexity>=0.1.2",
+    "langchainhub>=0.1.21",
+    "langgraph>=0.6.0",
+    "matplotlib>=3.10.3",
+    "pandas>=2.3.1",
+    "python-dotenv>=1.1.1",
+    "scikit-learn>=1.7.1",
+    "seaborn>=0.13.2",
+]
