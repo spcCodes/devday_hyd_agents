@@ -13,6 +13,7 @@ dependencies = [
     "langchain-mcp-adapters>=0.1.9",
     "langchain-openai>=0.3.28",
     "langchain-perplexity>=0.1.2",
+    "langchain-tavily>=0.2.11",
     "langchainhub>=0.1.21",
     "langgraph>=0.6.0",
     "matplotlib>=3.10.3",
