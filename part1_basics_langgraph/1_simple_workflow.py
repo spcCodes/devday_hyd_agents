@@ -11,32 +11,46 @@ from typing import TypedDict
 
 model = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
 
-# 1. Define the state
+# define the state
+
+from typing import Annotated
+from langgraph.graph.message import add_messages
+
 class State(TypedDict):
-    message: str
+    # Messages have the type "list". The `add_messages` function
+    # in the annotation defines how this state key should be updated
+    # (in this case, it appends messages to the list, rather than overwriting them)
+    messages:Annotated[list,add_messages]
 
-#nodes definition
-def greet_user(state: State) -> State:
-    """Greet the user with a message."""
-    user_message = state.get("message", "")
-    return {"message": f"Hello {user_message}!"}
+def greet_user(state:State):
+    """
+    this function will greet the user with a message
+    """
+    user_message = state["messages"][0].content
+    return {"messages" : [f"Hello {user_message}!"]}
 
 
-def convert_to_uppercase(state: State) -> State:
-    """Convert the input word in the state to uppercase."""
-    state["message"] = state["message"].upper()
-    return state
+def convert_to_uppercase(state:State):
+    """
+    This function will convert the input word in the state to uppercase
+    """
+    last_message = state["messages"][-1].content
+    return {"messages" : [last_message.upper()]}
 
-#define the workflow
 
-workflow = StateGraph(State)
-workflow.add_node("User_greetings", greet_user)
-workflow.add_node("Uppercase_converter", convert_to_uppercase)
-workflow.add_edge(START, "User_greetings")
-workflow.add_edge("User_greetings", "Uppercase_converter")
-workflow.add_edge("Uppercase_converter", END)
-app = workflow.compile()
+
+graph = StateGraph(State)
+graph.add_node("greet_user", greet_user)
+graph.add_node("convert_to_uppercase", convert_to_uppercase)
+
+graph.add_edge(START, "greet_user")
+graph.add_edge("greet_user", "convert_to_uppercase")
+graph.add_edge("convert_to_uppercase", END)
+
+app = graph.compile()
 
 if __name__ == "__main__":
-    result = app.invoke({"message": "Suman"})
+    result = app.invoke({"messages":"Suman"})
     print(result)
+    print("*******************")
+    print(result["messages"][-1].content)
