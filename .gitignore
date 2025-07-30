@@ -211,3 +211,6 @@ __marimo__/
 
 __pycache__/
 .DS_Store
+
+task1_soln.py
+task2_soln.py
