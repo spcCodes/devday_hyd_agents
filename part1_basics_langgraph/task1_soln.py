@@ -28,23 +28,61 @@ def classify_intent(state:State):
     """
     This function will classify the intent of the message
     """
-    user_input = state["messages"][0].content
-    prompt = f"You have to classify the intent of the message. this can be either question, feedback, help, complaint, or other. Return the intent as a string."
-    final_message = user_input + prompt
-    response = model.invoke(final_message).content
-    return {"messages": [response]}
+    user_query = state["messages"][0].content
+
+    intent_classifier_template = ChatPromptTemplate(
+        [
+        ('system', 'You have to classify the intent of the message. This can be either question, feedback, help, complaint, or other. Return the intent as a string.'),
+        ('human', '{query}')
+        ])
+
+    intent_classifier_chain = intent_classifier_template | model
+
+    result = intent_classifier_chain.invoke({'query': user_query})
+
+    return {"messages": [result.content]}
 
 def respond_to_intent(state:State):
     """
     This function will respond to the intent of the message
     """
-    user_input = state["messages"][0].content
+    user_query = state["messages"][0].content
     intent = state["messages"][-1].content
 
-    prompt = "You are an intelligent assistant. You will be given an user input and intent. you jave to respond to the user based on the intent. Return the response as a string."
-    final_message = user_input + intent + prompt
-    response = model.invoke(final_message).content
-    return {"messages": [response]}
+    response_template = ChatPromptTemplate(
+        [
+        ('system', 'You are an intelligent assistant. You will respond to the user based on their message and its classified intent. Return the response as a string.'),
+        ('human', 'User message: {query}\nClassified intent: {intent}')
+        ])
+
+    response_chain = response_template | model
+
+    result = response_chain.invoke({
+        'query': user_query,
+        'intent': intent
+    })
+
+    return {"messages": [result.content]}
+
+
+def sentiment_classifier(state:State):
+    """
+    This function will classify the sentiment of the message
+    """
+    user_query = state["messages"][0].content
+
+    sentiment_classifier_template = ChatPromptTemplate(
+        [
+        ('system','You are a sentiment classifier. You will be given a message and you will need to classify the sentiment of the message. The sentiment can be positive, negative or neutral. Return the sentiment as a string.'),
+        ('human','{query}')
+        ])
+
+    sentiment_classifier_chain = sentiment_classifier_template | model
+
+    result = sentiment_classifier_chain.invoke({'query':user_query})
+
+    return {"messages": [result.content]}
+
 
 
 graph = StateGraph(State)
